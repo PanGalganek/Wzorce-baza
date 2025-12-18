@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Baza Odczynników</title>
+</head>
+<body>
+    <h1>Moja baza odczynników</h1>
+    <table id="tabela-odczynnikow" border="1">
+        <thead>
+            <tr>
+                <th>Numer</th>
+                <th>Grupa</th>
+                <th>Zastosowanie</th>
+                <th>Data ważności</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Tu będą wiersze z odczynnikami -->
+        </tbody>
+    </table>
+    <button onclick="dodajWiersz()">Dodaj odczynnik</button>
+
+    <script>
+        // Prosty skrypt do dodawania/usuwania wierszy i sprawdzania dat ważności
+        function dodajWiersz() {
+            const tabela = document.getElementById('tabela-odczynnikow').getElementsByTagName('tbody')[0];
+            const nowyWiersz = tabela.insertRow();
+            nowyWiersz.innerHTML = '<td contenteditable="true">1</td>' +
+                '<td contenteditable="true">Grupa</td>' +
+                '<td contenteditable="true">Zastosowanie</td>' +
+                '<td contenteditable="true">2025-12-31</td>' +
+                '<td><button onclick="usunWiersz(this)">Usuń</button></td>';
+        }
+
+        function usunWiersz(button) {
+            const wiersz = button.parentElement.parentElement;
+            wiersz.remove();
+        }
+
+        function sprawdzDaty() {
+            const dzisiaj = new Date();
+            const wiersze = document.querySelectorAll('#tabela-odczynnikow tbody tr');
+            wiersze.forEach(wiersz => {
+                const dataWaznosci = new Date(wiersz.cells[3].innerText);
+                const dniRoboczePrzed = policzDniRobocze(dzisiaj, dataWaznosci);
+                if (dniRoboczePrzed <= 30) {
+                    alert('Odczynnik o numerze ' + wiersz.cells[0].innerText + ' zbliża się do końca ważności!');
+                }
+            });
+        }
+
+        function policzDniRobocze(start, end) {
+            let dniRobocze = 0;
+            let currentDate = new Date(start);
+            while (currentDate < end) {
+                const dayOfWeek = currentDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Pomijamy niedziele (0) i soboty (6)
+                    dniRobocze++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return dniRobocze;
+        }
+
+        // Sprawdzamy daty przy ładowaniu strony i co jakiś czas (np. raz dziennie)
+        sprawdzDaty();
+        setInterval(sprawdzDaty, 24 * 60 * 60 * 1000); // Raz na dobę
+    </script>
+</body>
+</html>
